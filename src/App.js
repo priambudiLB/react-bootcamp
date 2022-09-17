@@ -3,6 +3,7 @@ import './App.css';
 import Age from './Age'
 import { useEffect, useState } from 'react';
 import Progress from './Progress';
+import CatFact from './CatFact';
 
 const list = ['ubuntu', 'windows', 'macos', 'manjaro', 'android']
 const employees = [
@@ -26,6 +27,7 @@ function App() {
   return (
     <div className={appClassname}>
       <header className="App-header">
+        <CatFact />
         <Age counter={counter} setCounter={setCounter} />
         <Progress progress={counter} />
         <Progress progress={100} />
