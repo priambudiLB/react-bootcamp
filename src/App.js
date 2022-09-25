@@ -1,61 +1,90 @@
-import logo from './logo.svg';
-import './App.css';
-import Age from './Age'
-import { useEffect, useState } from 'react';
-import Progress from './Progress';
-import CatFact from './CatFact';
+import React from 'react';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
 
-const list = ['ubuntu', 'windows', 'macos', 'manjaro', 'android']
-const employees = [
-  {
-    name: "bagas",
-    age: 10
-  },
-  {
-    name: "lintang",
-    age: 11
+const SignupSchema = Yup.object().shape({
+  firstName: Yup.string()
+    .min(2, 'Too Short!')
+    .max(50, 'Too Long!')
+    .required('Required'),
+  lastName: Yup.string()
+    .min(2, 'Too Short!')
+    .max(50, 'Too Long!')
+    .required('Required'),
+  email: Yup.string().email('Invalid email').required('Required'),
+});
+
+const validate = values => {
+  const errors = {};
+  if (!values.firstName) {
+    errors.firstName = 'Required';
+  } else if (values.firstName.length > 15) {
+    errors.firstName = 'Must be 15 characters or less';
   }
-]
-const appClassname = 'App hehe'
 
-function App() {
-  const [counter, setCounter] = useState(0)
-  useEffect(() => {
-    // biasanya dipake buat call API, 1x aja di awal.
-    console.log('useeffect 2')
-  }, [])
+  if (!values.lastName) {
+    errors.lastName = 'Required';
+  } else if (values.lastName.length > 20) {
+    errors.lastName = 'Must be 20 characters or less';
+  }
+
+  if (!values.email) {
+    errors.email = 'Required';
+  } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)) {
+    errors.email = 'Invalid email address';
+  }
+
+  return errors;
+};
+
+const App = () => {
+  const formik = useFormik({
+    initialValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+    },
+    validate: validate,
+    validationSchema: SignupSchema,
+    onSubmit: values => {
+      alert(JSON.stringify(values, null, 2));
+    },
+  });
   return (
-    <div className={appClassname}>
-      <header className="App-header">
-        <CatFact />
-        <Age counter={counter} setCounter={setCounter} />
-        <Progress progress={counter} />
-        <Progress progress={100} />
-        <ul className="list-group">
-          {
-            employees.map((value, index) => <li className="list-group-item">{value.name} berumur {value.age}</li>)
-          }
-        </ul>
-        <ul className="list-group">
-          {
-            list.map((value, index) => <li className="list-group-item">{value}</li>)
-          }
-        </ul>
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+    <form onSubmit={formik.handleSubmit}>
+      <label htmlFor="firstName">First Name</label>
+      <input
+        id="firstName"
+        name="firstName"
+        type="text"
+        onChange={formik.handleChange}
+        value={formik.values.firstName}
+      />
+      {formik.errors.firstName ? <div>{formik.errors.firstName}</div> : null}
 
-export default App;
+      <label htmlFor="lastName">Last Name</label>
+      <input
+        id="lastName"
+        name="lastName"
+        type="text"
+        onChange={formik.handleChange}
+        value={formik.values.lastName}
+      />
+      {formik.errors.lastName ? <div>{formik.errors.lastName}</div> : null}
+
+      <label htmlFor="email">Email Address</label>
+      <input
+        id="email"
+        name="email"
+        type="email"
+        onChange={formik.handleChange}
+        value={formik.values.email}
+      />
+      {formik.errors.email ? <div>{formik.errors.email}</div> : null}
+
+      <button type="submit">Submit</button>
+    </form>
+  );
+};
+
+export default App 
