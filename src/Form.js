@@ -61,6 +61,7 @@ const Form = () => {
               const sessionID = resp.data.session_id
               localStorage.setItem('sessionID', sessionID)
               alert('Login Success!')
+              window.location.href = '/'
             }).catch(e => {
               console.log(e)
             })
