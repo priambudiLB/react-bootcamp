@@ -26,40 +26,53 @@ const Form = () => {
     },
     validationSchema: Yup.object({
       username: Yup.string()
-        .min(6, 'Must be 6 characters or more')
-        .max(15, 'Must be 15 characters or less')
+        // .min(6, 'Must be 6 characters or more')
+        // .max(15, 'Must be 15 characters or less')
         .required('Required'),
       password: Yup.string()
-        .min(8, 'Must be 8 characters or more')
-        .max(20, 'Must be 20 characters or less')
+        // .min(8, 'Must be 8 characters or more')
+        // .max(20, 'Must be 20 characters or less')
         .required('Required')
-        .matches(
-          /^.*(?=.*\d)((?=.*[a-zA-Z]){1}).*$/,
-          "Password must contain atleast one letter and one number"
-        ),
+      // .matches(
+      //   /^.*(?=.*\d)((?=.*[a-zA-Z]){1}).*$/,
+      //   "Password must contain atleast one letter and one number"
+      // ),
     }),
     onSubmit: values => {
-      console.log(values)
-      // alert(JSON.stringify(values, null, 2));
+      generateRequestToken()
+        .then(requestToken => {
+          axios({
+            method: 'post',
+            url: `https://api.themoviedb.org/3/authentication/token/validate_with_login?api_key=${API_KEY}`,
+            data: {
+              request_token: requestToken,
+              username: values.username,
+              password: values.password
+            }
+          }).then(res => {
+            const verifiedRequestToken = res.data.request_token;
+            axios({
+              method: 'post',
+              url: `https://api.themoviedb.org/3/authentication/session/new?api_key=${API_KEY}`,
+              data: {
+                request_token: verifiedRequestToken
+              }
+            }).then(resp => {
+              const sessionID = resp.data.session_id
+              localStorage.setItem('sessionID', sessionID)
+              alert('Login Success!')
+            }).catch(e => {
+              console.log(e)
+            })
+          }).catch(e => {
+            console.error(e)
+          })
+        });
     },
   });
 
-  const generateSessionID = () => {
-    // axios({
-    //   method: 'post',
-    //   url: `https://api.themoviedb.org/3/authentication/session/new?api_key=${API_KEY}`,
-    //   data: {
-    //     // request_token: 
-    //   }
-    // })
-  }
-
   useEffect(() => {
-    // promise
-    generateRequestToken()
-      .then(requestToken => {
-        window.open("https://www.themoviedb.org/authenticate/" + requestToken + '?redirect_to=https://dibimbing.id/', "_blank")
-      });
+    console.log(localStorage.getItem('sessionID'))
   }, [])
 
   return <div>
