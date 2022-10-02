@@ -31,7 +31,7 @@ function NavBar() {
       <div className="container-fluid">
         {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a className="navbar-brand" href="#">
-          Navbar
+          Navbar baru bagas
         </a>
         <button
           className="navbar-toggler"
